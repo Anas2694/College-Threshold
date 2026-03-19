@@ -86,7 +86,7 @@ def render(u_name, u_sem, today):
                         unsafe_allow_html=True,
                     )
                     st.markdown('<div class="ghost-btn-container">', unsafe_allow_html=True)
-                    if st.button("open", key=f"btn_{row['id']}", label_visibility="hidden"):
+                    if st.button("open", key=f"btn_{row['id']}"):
                         st.session_state.sub_id = int(row["id"])
                         st.session_state.page   = "detail"
                         st.rerun()
