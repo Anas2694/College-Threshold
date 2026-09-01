@@ -1,7 +1,26 @@
-# 🎓 THRESHOLD — VTU Academic Tracker
+# 🎓 THRESHOLD: VTU Academic Tracker
 
 A sleek, dark-themed academic tracker built for BMSCE/VTU students.  
-Track marks, attendance, predict grades, manage bunks, and monitor SGPA/CGPA — all in one place.
+Track marks, attendance, predict grades, manage bunks, and monitor SGPA/CGPA, all in one place.
+
+## System Architecture
+
+```mermaid
+flowchart LR
+Client["Web Client"]
+App["Streamlit App"]
+DB[("SQLite Database")]
+PDF["PDF Engine (ReportLab)"]
+
+Client --> App
+App --> DB
+App --> PDF
+
+style Client fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#fff
+style App fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#fff
+style DB fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#fff
+style PDF fill:#451a03,stroke:#f59e0b,stroke-width:2px,color:#fff
+```
 
 ---
 
@@ -16,30 +35,64 @@ Track marks, attendance, predict grades, manage bunks, and monitor SGPA/CGPA —
 | 📈 **SGPA / CGPA** | Calculate current SGPA, track past semesters, run what-if scenarios |
 | 📅 **Academic Calendar** | Full BMSCE Even Semester 2025-26 schedule with live countdowns (IST) |
 | 👤 **Profile** | Name, department, current semester, photo |
+| **Analytics Dashboard** | Visual breakdown of academic performance using Plotly (SGPA trend, grade radar, attendance pie charts) |
+| **Export Reports** | Download full academic data as a generated PDF report or CSV summaries |
+| **Local Authentication** | Built-in offline authentication protecting user sessions and data |
+| **Customization** | Native dark and light mode theme toggles |
+
+### Authentication Flow
+```mermaid
+sequenceDiagram
+actor User
+participant App
+participant DB as "SQLite Database"
+
+User->>App: Submit login credentials
+App->>DB: Query user by username
+DB->>App: Return user record
+App->>App: Verify SHA256 password hash
+App->>User: Set session state & redirect to Dashboard
+```
+
+### Bunk Simulator Flow
+```mermaid
+sequenceDiagram
+actor User
+participant App
+participant Calc as "Calculations Engine"
+
+User->>App: Select target attendance % & classes to miss
+App->>Calc: Compute required vs planned classes
+Calc->>App: Return safe/risk status per subject
+App->>User: Render Bunk Day Simulator table
+```
 
 ---
 
 ## 🗂️ Project Structure
 
-```
+```text
 threshold/
-├── app.py                  # Main entry point
+├── app.py                  # Main entry point (Auth & Routing)
 ├── requirements.txt
 ├── README.md
 ├── utils/
-│   ├── __init__.py
-│   ├── database.py         # All SQLite DB functions
+│   ├── auth.py             # SQLite authentication
 │   ├── calculations.py     # Grade/marks/attendance math
 │   ├── calendar_data.py    # BMSCE academic calendar data
-│   └── styles.py           # Global CSS
+│   ├── charts.py           # Plotly chart generation
+│   ├── database.py         # SQLite DB operations
+│   ├── export.py           # PDF and CSV generation
+│   └── styles.py           # Global CSS (Dark/Light)
 └── pages/
-    ├── __init__.py
-    ├── dashboard.py        # Home dashboard
-    ├── calendar_page.py    # Calendar view
-    ├── sgpa_page.py        # SGPA / CGPA tracker
+    ├── analytics_page.py   # Visual charts
     ├── bunk_page.py        # Bunk planner
-    ├── subject_detail.py   # Subject marks & attendance detail
-    └── profile_page.py     # User profile
+    ├── calendar_page.py    # Calendar view
+    ├── dashboard.py        # Home dashboard
+    ├── export_page.py      # Data export views
+    ├── profile_page.py     # User settings
+    ├── sgpa_page.py        # SGPA / CGPA tracker
+    └── subject_detail.py   # Subject marks & attendance detail
 ```
 
 ---
@@ -49,8 +102,8 @@ threshold/
 ### Run locally
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/threshold.git
-cd threshold
+git clone https://github.com/Anas2694/College-Threshold.git
+cd College-Threshold
 pip install -r requirements.txt
 streamlit run app.py
 ```
@@ -59,11 +112,11 @@ streamlit run app.py
 
 ```python
 # Cell 1
-!pip install streamlit pyngrok -q
+!pip install streamlit pyngrok pandas numpy plotly reportlab Pillow -q
 
-# Cell 2 — upload your files or clone from GitHub
-!git clone https://github.com/YOUR-USERNAME/threshold.git
-%cd threshold
+# Cell 2: upload your files or clone from GitHub
+!git clone https://github.com/Anas2694/College-Threshold.git
+%cd College-Threshold
 
 # Cell 3
 !streamlit run app.py --server.port=8501 --server.headless=true &
@@ -88,10 +141,12 @@ Autonomous Institute, Affiliated to VTU
 ## ⚠️ Disclaimer
 
 This is a personal academic tool for educational purposes.  
-Grade calculations follow BMSCE's internal assessment scheme — verify with your institution.
+Grade calculations follow BMSCE's internal assessment scheme: verify with your institution.
 
 ---
 
 ## 📄 License
 
-MIT License — free to use and modify.
+No license file is currently included. Unless a license is added, the repository's source remains under the author's default copyright.
+
+[![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://dokugen.samueltuoyo.com)
